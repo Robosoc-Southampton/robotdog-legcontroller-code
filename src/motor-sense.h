@@ -8,6 +8,8 @@
 
 /**
  * The most recent current value read for each motor.
+ * Multiply this value by 440/799 to get the current in 0.1 amps
+ * (use 141/256 for approximate value but fast maths).
  */
 extern volatile uint8_t motor_current[MOTOR_CURRENT_CHANNELS];
 
