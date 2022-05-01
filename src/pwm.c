@@ -6,7 +6,7 @@
 #include <util/atomic.h>
 #include <stdbool.h>
 
-#define TIMER_PRESC 8
+#define TIMER_PRESC (8)
 #define TIMER_TOP (F_CPU / TIMER_PRESC / 50 / PWM_CHANNELS - 1)
 
 #define TIMER_ONE_MS (F_CPU / TIMER_PRESC / 1000)
@@ -26,7 +26,7 @@ void init_pwm()
     
     // Set default value for all channels:
     for (uint8_t i = 0; i < PWM_CHANNELS; i++)
-        pwm_value[i] = TIMER_ONE_MS;
+        pwm_set_value(i, 0);
     
     // Set up timer:
     OCR1A = TIMER_TOP;
@@ -52,18 +52,39 @@ bool pwm_get_enabled(uint8_t channel)
     return (bool) pin_mask_enable[channel];
 }
 
-void pwm_set_value(uint8_t channel, uint16_t value)
+void pwm_set_value(uint8_t channel, int16_t value)
 {
+    uint16_t value_raw = (TIMER_ONE_MS * 3/2) + ((TIMER_ONE_MS * value) >> 16) - 1;
+    
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        // add 1 to UINT16_MAX to get a power of two - much faster division.
-        pwm_value[channel] = TIMER_ONE_MS + (TIMER_ONE_MS + 1) * value / ((uint32_t) UINT16_MAX + 1);
+        pwm_value[channel] = value_raw;
     }
 }
 
-uint16_t pwm_get_value(uint8_t channel)
+int16_t pwm_get_value(uint8_t channel)
 {
-    return ((uint16_t) (pwm_value[channel] - TIMER_ONE_MS)) * ((uint32_t) UINT16_MAX + 1) / (TIMER_ONE_MS + 1);
+    // Reverse of pwm_set_value but rearranged to avoid slow runtime division:
+    return (pwm_value[channel] - (TIMER_ONE_MS * 3/2) + 1) * (((uint32_t) 1 << 24) / TIMER_ONE_MS) / (1 << 8);
+}
+
+void pwm_set_value_raw(uint8_t channel, uint16_t value)
+{
+    // Constrain value between 0.5 and 2.5 ms:
+    if (value <= TIMER_ONE_MS * 1/2)
+        value = TIMER_ONE_MS * 1/2;
+    else if (value >= TIMER_ONE_MS * 5/2)
+        value = TIMER_ONE_MS * 5/2;
+    
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        pwm_value[channel] = value;
+    }
+}
+
+uint16_t pwm_get_value_raw(uint8_t channel)
+{
+    return pwm_value[channel];
 }
 
 ISR(TIMER1_OVF_vect)

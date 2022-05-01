@@ -23,15 +23,26 @@ void pwm_set_enabled(uint8_t channel, bool enabled);
 bool pwm_get_enabled(uint8_t channel);
 
 /**
- * Sets the PWM pulse width of a channel, where 0 corresponds to 1 ms
- * and UINT16_MAX corresponds to 2 ms.
+ * Sets the PWM pulse width of a channel, where INT16_MIN corresponds to 1 ms,
+ * 0 corresponds to 1.5 ms, and INT16_MAX corresponds to 2 ms.
  */
-void pwm_set_value(uint8_t channel, uint16_t value);
+void pwm_set_value(uint8_t channel, int16_t value);
 
 /**
- * Gets the PWM pulse width of a channel, where 0 corresponds to 1 ms
- * and UINT16_MAX corresponds to 2 ms.
+ * Gets the PWM pulse width of a channel, where INT16_MIN corresponds to 1 ms,
+ * 0 corresponds to 1.5 ms, and INT16_MAX corresponds to 2 ms.
  */
-uint16_t pwm_get_value(uint8_t channel);
+int16_t pwm_get_value(uint8_t channel);
+
+/**
+ * Sets the raw timer value for a PWM channel.
+ * Note that the pulse width is contrained between 0.5 and 2.5 ms.
+ */
+void pwm_set_value_raw(uint8_t channel, uint16_t value);
+
+/**
+ * Gets the raw timer value for a PWM channel.
+ */
+uint16_t pwm_get_value_raw(uint8_t channel);
 
 #endif /* PWM_H */
