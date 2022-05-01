@@ -6,6 +6,9 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
+/**
+ * Macros for reading the pin states.
+ */
 #define STATE_0A() ((PINA >> PINA7) & 1)
 #define STATE_0B() ((PINA >> PINA6) & 1)
 #define STATE_1A() ((PIND >> PIND1) & 1)
@@ -28,7 +31,7 @@ void init_rotary_encoders()
     PCMSK3 = (1 << PCINT25) | (1 << PCINT24);  // Port D
     
     // Enable pin change interrupts on port A, C and D
-    PCICR |= (1 << PCIE3) | (1 << PCIE2) | (1 << PCIE0); 
+    PCICR |= (1 << PCIE3) | (1 << PCIE2) | (1 << PCIE0);
     
     sei();
 }
