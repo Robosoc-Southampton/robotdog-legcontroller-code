@@ -35,7 +35,7 @@ ISR(ADC_vect)
 {
     static uint8_t channel = 0;
     
-    motor_current[channel] = ADCH; 
+    motor_current[channel] = ADCH;
     channel++;
     
     // If we've haven't reached the last channel yet continue
