@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define MOTOR_PORTS 6
+#define MOTOR_PORTS 3
 
 enum motor_type {
     NONE      = 0b00,
@@ -13,11 +13,10 @@ enum motor_type {
 };
 
 struct motor {
-    enum motor_type type;
-    uint8_t current_limit;
-    bool overcurrent_flag;
-    uint16_t target_pos, target_vel, target_acc;
-    uint16_t actual_pos;
+    const enum motor_type type;
+    const uint16_t precision; // the number of divisions in one revolution
+    int16_t target_pos;
+    int16_t actual_pos;
 };
 
 /**
@@ -25,6 +24,18 @@ struct motor {
  * through this.
  */
 extern struct motor motors[MOTOR_PORTS];
+
+/**
+ * Writing a `1` to a bit in this variable will calibrate the corresponding
+ * motor. The bit will be automatically cleared once calibration is complete.
+ */
+extern uint8_t motor_calibrate_flags;
+
+/**
+ * Each motor can be enabled/disabled by writing a `1` or `0` respectively
+ * to the corresponding bit in this variable.
+ */
+extern uint8_t motor_enabled_flags;
 
 /**
  * Initialises the motors.
