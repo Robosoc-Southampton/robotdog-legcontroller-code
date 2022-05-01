@@ -2,4 +2,4 @@
 
 - Compile with `make`
 - Upload to microcontoller with `make install`
-- Disassemble with `make disasm`
+- Generate assembly code with `make asm`
