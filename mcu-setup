@@ -1,0 +1,12 @@
+#!/bin/bash
+
+PROGRAMMER="c232hm"
+AVR_PART="m644p"
+
+FUSE_E=0xFF
+FUSE_H=0xDA
+FUSE_L=0xE7
+
+avrdude -c $(PROGRAMMER) -p $(AVR_PART) -U efuse:w:$(FUSE_E):m
+avrdude -c $(PROGRAMMER) -p $(AVR_PART) -U hfuse:w:$(FUSE_H):m
+avrdude -c $(PROGRAMMER) -p $(AVR_PART) -U lfuse:w:$(FUSE_L):m
